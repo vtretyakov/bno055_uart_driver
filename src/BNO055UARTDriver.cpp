@@ -7,8 +7,8 @@ BNO055UARTDriver::BNO055UARTDriver(ros::NodeHandle &nh) {
     device = nh.param<std::string>("device", "/dev/ttyUSB1");
     baudrate = nh.param("baud", 115200);
 
-    imuPublisher = nh.advertise<sensor_msgs::Imu>("imu", 1);
-    imuTemperaturePublisher = nh.advertise<sensor_msgs::Temperature>("imu/temperature", 1);
+    imuPublisher = nh.advertise<sensor_msgs::Imu>("data", 1);
+    imuTemperaturePublisher = nh.advertise<sensor_msgs::Temperature>("temperature", 1);
 }
 
 void BNO055UARTDriver::spin() {
@@ -56,7 +56,7 @@ void BNO055UARTDriver::spin() {
 void BNO055UARTDriver::readIMUData() {
     sensor_msgs::Imu imuMsg;
     auto now = ros::Time::now();
-    imuMsg.header.frame_id = "imu";
+    imuMsg.header.frame_id = "imu_link";
     imuMsg.header.stamp = now;
 
     BNO055Register data {};
@@ -64,7 +64,7 @@ void BNO055UARTDriver::readIMUData() {
 
     sensor_msgs::Temperature temperatureMsg;
     temperatureMsg.header.stamp = now;
-    temperatureMsg.header.frame_id = "imu";
+    temperatureMsg.header.frame_id = "imu_link";
     temperatureMsg.temperature = data.temperature / (double)BNO055_TEMP_DIV_CELSIUS;
     imuTemperaturePublisher.publish(temperatureMsg);
 
